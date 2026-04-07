@@ -25,10 +25,10 @@ try {
     }
 
     const playerPasses = {
-      "4686823406": [
-        { id: 1781500610,  name: "Donate 5",  price: 5 },
-        { id: 1779316655, name: "Donate 10", price: 10 },
-        { id: 1780666612, name: "Donate 25", price: 25 }
+      "<4686823406>": [
+        { id: <1781500610>,  name: "Donate 5",  price: 5 },
+        { id: <1779316655>, name: "Donate 10", price: 10 },
+        { id: <1780666612>, name: "Donate 25", price: 25 }
       ]
     };
 
