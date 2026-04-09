@@ -17,13 +17,13 @@ app.get("/api/passes", (req, res) => {
     return res.status(403).json({ error: "Unauthorized" });
   }
 
-  const playerPasses = {
-    "46688234068": [
-      { id: 1781500610, name: "Donate 5", price: 5 },
-      { id: 1779316655, name: "Donate 10", price: 10 },
-      { id: 1780666612, name: "Donate 25", price: 25 }
-    ]
-  };
+  cconst playerPasses = {
+  "46688234068": [
+    { id: 1791363134, name: "Donate 5", price: 5 },
+    { id: 1789882618, name: "Donate 10", price: 10 },
+    { id: 1789084533, name: "Donate 25", price: 25 }
+  ]
+};
 
   res.json({
     success: true,
