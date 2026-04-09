@@ -17,7 +17,7 @@ app.get("/api/passes", (req, res) => {
     return res.status(403).json({ error: "Unauthorized" });
   }
 
-  cconst playerPasses = {
+  const playerPasses = {
   "46688234068": [
     { id: 1791363134, name: "Donate 5", price: 5 },
     { id: 1789882618, name: "Donate 10", price: 10 },
