@@ -1,15 +1,9 @@
 const express = require("express");
+const axios = require("axios");
+
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("OK");
-});
-
-app.get("/test", (req, res) => {
-  res.send("TEST ROUTE WORKS");
-});
-
-app.get("/api/passes", (req, res) => {
+app.get("/api/passes", async (req, res) => {
   const userId = req.query.userId;
   const key = req.query.key;
 
@@ -17,18 +11,49 @@ app.get("/api/passes", (req, res) => {
     return res.status(403).json({ error: "Unauthorized" });
   }
 
-  const playerPasses = {
-  "4686823406": [
-    { id: 1791363134, name: "Donate 5", price: 5 },
-    { id: 1789882618, name: "Donate 10", price: 10 },
-    { id: 1789084533, name: "Donate 25", price: 25 }
-  ]
-};
+  try {
+    // 🔥 Step 1: Get user's games
+    const gamesRes = await axios.get(
+      `https://games.roblox.com/v2/users/${userId}/games?accessFilter=Public&limit=50`
+    );
 
-  res.json({
-    success: true,
-    passes: playerPasses[userId] || []
-  });
+    const games = gamesRes.data.data;
+
+    let allPasses = [];
+
+    // 🔥 Step 2: Loop games → get passes
+    for (const game of games) {
+      const universeId = game.id;
+
+      const passesRes = await axios.get(
+        `https://games.roblox.com/v1/games/${universeId}/game-passes?limit=50`
+      );
+
+      const passes = passesRes.data.data;
+
+      for (const pass of passes) {
+        if (pass.price !== null) {
+          allPasses.push({
+            id: pass.id,
+            name: pass.name,
+            price: pass.price
+          });
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      passes: allPasses
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.json({
+      success: false,
+      passes: []
+    });
+  }
 });
 
 const PORT = process.env.PORT || 10000;
