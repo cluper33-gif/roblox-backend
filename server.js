@@ -18,7 +18,7 @@ app.get("/api/passes", (req, res) => {
   }
 
   const playerPasses = {
-  "46688234068": [
+  "4686823406": [
     { id: 1791363134, name: "Donate 5", price: 5 },
     { id: 1789882618, name: "Donate 10", price: 10 },
     { id: 1789084533, name: "Donate 25", price: 25 }
