@@ -12,33 +12,30 @@ app.get("/api/passes", async (req, res) => {
   }
 
   try {
-    // 🔥 Step 1: Get user's games
-    const gamesRes = await axios.get(
-      `https://games.roblox.com/v2/users/${userId}/games?accessFilter=Public&limit=50`
-    );
-
-    const games = gamesRes.data.data;
-
     let allPasses = [];
 
-    // 🔥 Step 2: Loop games → get passes
-    for (const game of games) {
-      const universeId = game.id;
-
-      const passesRes = await axios.get(
-        `https://games.roblox.com/v1/games/${universeId}/game-passes?limit=50`
-      );
-
-      const passes = passesRes.data.data;
-
-      for (const pass of passes) {
-        if (pass.price !== null) {
-          allPasses.push({
-            id: pass.id,
-            name: pass.name,
-            price: pass.price
-          });
+    // 🔥 Get passes directly from catalog (THIS WORKS)
+    const response = await axios.get(
+      `https://catalog.roblox.com/v1/search/items/details`,
+      {
+        params: {
+          Category: 1,
+          CreatorTargetId: userId,
+          CreatorType: "User",
+          Limit: 30
         }
+      }
+    );
+
+    const items = response.data.data;
+
+    for (const item of items) {
+      if (item.itemType === "Game Pass" && item.price !== null) {
+        allPasses.push({
+          id: item.id,
+          name: item.name,
+          price: item.price
+        });
       }
     }
 
@@ -48,7 +45,8 @@ app.get("/api/passes", async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("ERROR:", err.message);
+
     res.json({
       success: false,
       passes: []
