@@ -3,49 +3,43 @@ const axios = require("axios");
 
 const app = express();
 
+// 🔐 your secret key (set this in Render ENV)
+const SECRET_KEY = process.env.SECRET_KEY;
+
+// 🧪 test route
+app.get("/", (req, res) => {
+  res.send("Backend running");
+});
+
+// 🎯 MAIN ROUTE
 app.get("/api/passes", async (req, res) => {
   const userId = req.query.userId;
   const key = req.query.key;
 
-  if (key !== process.env.SECRET_KEY) {
-    return res.status(403).json({ error: "Unauthorized" });
+  // 🔐 security check
+  if (key !== SECRET_KEY) {
+    return res.json({ success: false, error: "Unauthorized" });
   }
 
   try {
-    let allPasses = [];
+    // 🔥 Roblox API (get gamepasses)
+    const url = `https://games.roblox.com/v1/users/${userId}/game-passes?limit=50`;
 
-    // 🔥 Get passes directly from catalog (THIS WORKS)
-    const response = await axios.get(
-      `https://catalog.roblox.com/v1/search/items/details`,
-      {
-        params: {
-          Category: 1,
-          CreatorTargetId: userId,
-          CreatorType: "User",
-          Limit: 30
-        }
-      }
-    );
+    const response = await axios.get(url);
 
-    const items = response.data.data;
-
-    for (const item of items) {
-      if (item.itemType === "Game Pass" && item.price !== null) {
-        allPasses.push({
-          id: item.id,
-          name: item.name,
-          price: item.price
-        });
-      }
-    }
+    const passes = response.data.data.map(pass => ({
+      id: pass.id,
+      name: pass.name,
+      price: pass.price
+    }));
 
     res.json({
       success: true,
-      passes: allPasses
+      passes: passes
     });
 
   } catch (err) {
-    console.error("ERROR:", err.message);
+    console.error(err.message);
 
     res.json({
       success: false,
@@ -54,8 +48,9 @@ app.get("/api/passes", async (req, res) => {
   }
 });
 
+// 🚀 start server
 const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
-  console.log("Server running");
+  console.log("Server running on port", PORT);
 });
